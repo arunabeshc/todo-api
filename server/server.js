@@ -19,7 +19,8 @@ app.post('/todos',(req,res)=>{
 
 
   todos.save().then((doc)=>{
-    res.send(200,`data saved successfully ,${JSON.stringify(doc,undefined,2)}`);
+    //res.send(200,`data saved successfully ,${JSON.stringify(doc,undefined,2)}`);
+    res.send(200,doc);
   },(e)=>{
     res.send(400,e);
   });
@@ -28,6 +29,8 @@ app.post('/todos',(req,res)=>{
 app.listen(3000,()=>{
   console.log('Started server on port 3000');
 });
+
+module.exports={app}
 
 // var newUser=new user({
 //   email:'  '
