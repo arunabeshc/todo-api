@@ -14,7 +14,9 @@ app.post('/todos',(req,res)=>{
   //console.log(req.body);
 
   var todos=new todo({
-    text:req.body.text
+    text:req.body.text,
+    completed:req.body.completed,
+    completedAt:req.body.completedAt
   });
 
 
@@ -24,6 +26,14 @@ app.post('/todos',(req,res)=>{
   },(e)=>{
     res.send(400,e);
   });
+})
+
+app.get('/todos',(req,res)=>{
+  todo.find().then((todos)=>{
+    res.send({todos});
+  },(e)=>{
+    res.send(e);
+  })
 })
 
 app.listen(3000,()=>{
