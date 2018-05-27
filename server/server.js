@@ -26,7 +26,7 @@ app.post('/todos',(req,res)=>{
   },(e)=>{
     res.send(400,e);
   });
-})
+});
 
 app.get('/todos',(req,res)=>{
   todo.find().then((todos)=>{
