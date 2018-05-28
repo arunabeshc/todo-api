@@ -45,11 +45,11 @@ app.get('/todos/:id',(req,res)=>{
     return res.send(404,'Invalid ID');
   }
 
-  todo.findById(id).then((docs)=>{
-    if(!docs){
+  todo.findById(id).then((todo)=>{
+    if(!todo){
         return res.send(404);
     }else{
-    return res.send(200,`Data found ${JSON.stringify(docs,undefined,2)}`)
+    return res.send({todo});
   }
 }).catch((e)=>{
   res.send(400);
