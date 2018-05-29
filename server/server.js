@@ -74,7 +74,7 @@ app.delete('/todos/:id',(req,res)=>{
 }).catch((e)=>{
   res.send(400);
 });
-})
+});
 
 
 app.listen(port,()=>{

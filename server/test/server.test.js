@@ -139,4 +139,62 @@ describe('GET/todos/:id',()=>{
     });
   });
 
-})
+});
+
+
+describe('DELETE/todos/:id',()=>{
+  it('should delete todo doc',(done)=>{
+    //console.log(`/todos/${todos[0]._id.toHexString()}`);
+    request(app)
+    .delete(`/todos/${todos[1]._id.toHexString()}`)
+    .expect(200)
+    .expect((res)=>{
+      expect(res.body.todo.text).toBe(todos[1].text);
+    })
+    .end((err,res)=>{
+      if(err){
+        return done(err);
+      }
+
+      todo.findById(todos[1]._id.toHexString()).then((result)=>{
+        expect(result).toNotExist();
+        done();
+      }).catch((e)=>{
+        done(e);
+      })
+
+      //done();
+    });
+  });
+
+    it('should return 404 if todo not found',(done)=>{
+      //console.log(`/todos/${todos[0]._id.toHexString()}`);
+      request(app)
+      .delete(`/todos/5b0d63cddcc2831981059aa3`)
+      .expect(404)
+
+      .end((err,res)=>{
+        if(err){
+          return done(err);
+        }
+
+        done();
+      });
+    });
+
+    it('should return 404 for invalid ids',(done)=>{
+      //console.log(`/todos/${todos[0]._id.toHexString()}`);
+      request(app)
+      .delete(`/todos/123`)
+      .expect(404)
+
+      .end((err,res)=>{
+        if(err){
+          return done(err);
+        }
+
+        done();
+      });
+    });
+
+  });
