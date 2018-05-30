@@ -1,5 +1,7 @@
-var express=require('express');
-var bodyparser=require('body-parser');
+const _=require('lodash');
+
+const express=require('express');
+const bodyparser=require('body-parser');
 
 const {ObjectID}=require('mongodb');
 
@@ -76,6 +78,36 @@ app.delete('/todos/:id',(req,res)=>{
 });
 });
 
+app.patch('/todos/:id',(req,res)=>{
+  var id=req.params.id;
+  var body=_.pick(req.body,['text','completed']);
+
+  if(!ObjectID.isValid(id)){
+    return res.send(404,'Invalid ID');
+  }
+
+  if(_.isBoolean(body.completed) && body.completed)
+{
+  body.completedAt=new Date().getTime();
+}
+else
+{
+  body.completed=false;
+  body.completedAt=null;
+}
+
+todo.findByIdAndUpdate(id, {$set:body}, {new:true}).then((todo)=>{
+  if(!todo){
+    return  res.send(404,'Todo not found');
+  }
+
+  return res.send({todo});
+
+}).catch((e)=>{
+  console.log(e);
+});
+
+});
 
 app.listen(port,()=>{
   console.log(`started server on port ${port}`);
