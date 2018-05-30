@@ -12,7 +12,9 @@ var todos=[{
 },
 {
   _id:new ObjectID(),
-  text:"second todo"
+  text:"second todo",
+  completed:true,
+  completedAt: 333
 }];
 
 beforeEach((done)=>{
@@ -198,3 +200,85 @@ describe('DELETE/todos/:id',()=>{
     });
 
   });
+
+
+  describe('PATCH/todos/:id',()=>{
+
+    it('should update todo doc',(done)=>{
+      var text1=todos[1]._id.toHexString();
+      var text='modified todo';
+      var completed=true;
+      //console.log(`/todos/${todos[0]._id.toHexString()}`);
+      request(app)
+      .patch(`/todos/${todos[1]._id.toHexString()}`)
+      .send({text})
+      .send({completed})
+      .expect(200)
+      .expect((todo)=>{
+        expect(todo.id).toBe(todos[1].id);
+      })
+      .end((err,res)=>{
+        if(err){
+          return done(err);
+        }
+
+        todo.findById(todos[1]._id.toHexString()).then((todo)=>{
+          expect(todo.completed).toBe(true);
+            expect(todo.completedAt).toBeA('number');
+            expect(todo.text).toNotBe(text1);
+          
+          done();
+        }).catch((e)=>{
+          done(e);
+        })
+
+        //done();
+      });
+    });
+
+      it('should clear completedAt when todo is not completed',(done)=>{
+        var text1=todos[0]._id.toHexString();
+        var text='modified todo next';
+        //console.log(`/todos/${todos[0]._id.toHexString()}`);
+        request(app)
+        .patch(`/todos/${todos[0]._id.toHexString()}`)
+        .send({text})
+        .expect(200)
+        .expect((todo)=>{
+          expect(todo.id).toBe(todos[0].id);
+        })
+        .end((err,res)=>{
+          if(err){
+            return done(err);
+          }
+
+          todo.findById(todos[0]._id.toHexString()).then((todo)=>{
+              expect(todo.completed).toBe(false);
+              expect(todo.completedAt).toNotExist();
+
+            done();
+          }).catch((e)=>{
+            done(e);
+          })
+
+          //done();
+        });
+      });
+
+
+      // it('should return 404 for invalid ids',(done)=>{
+      //   //console.log(`/todos/${todos[0]._id.toHexString()}`);
+      //   request(app)
+      //   .delete(`/todos/123`)
+      //   .expect(404)
+      //
+      //   .end((err,res)=>{
+      //     if(err){
+      //       return done(err);
+      //     }
+      //
+      //     done();
+      //   });
+      // });
+
+    });
