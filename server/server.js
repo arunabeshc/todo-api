@@ -121,8 +121,6 @@ app.post('/users',(req,res)=>{
     password:body.password
   });
 
-
-
   users.save().then(()=>{
     //res.send(200,`data saved successfully ,${JSON.stringify(doc,undefined,2)}`);
 
@@ -135,6 +133,18 @@ app.post('/users',(req,res)=>{
   });
 });
 
+app.get('/users/me',(req,res)=>{
+  var token=req.header('x-auth');
+
+  user.findByToken(token).then((user)=>{
+    if(!user){
+      return Promise.reject();
+    }
+      res.status(200).send(user);
+  }).catch((e)=>{
+      return  res.status(401).send(401,e);
+  });
+});
 
 app.listen(port,()=>{
   console.log(`started server on port ${port}`);
