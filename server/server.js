@@ -10,6 +10,7 @@ const {ObjectID}=require('mongodb');
 var {mongoose}=require('./db/mongoose');
 var {user}=require('./models/user');
 var {todo}=require('./models/todo');
+var {authenticate}=require('./middleware/authenticate');
 
 const port=process.env.PORT;
 
@@ -133,17 +134,9 @@ app.post('/users',(req,res)=>{
   });
 });
 
-app.get('/users/me',(req,res)=>{
-  var token=req.header('x-auth');
 
-  user.findByToken(token).then((user)=>{
-    if(!user){
-      return Promise.reject();
-    }
-      res.status(200).send(user);
-  }).catch((e)=>{
-      return  res.status(401).send(401,e);
-  });
+app.get('/users/me',authenticate, (req,res)=>{
+  res.send(req.user);
 });
 
 app.listen(port,()=>{
