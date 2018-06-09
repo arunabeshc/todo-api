@@ -2,6 +2,7 @@ const {mongoose}=require('../db/mongoose.js');
 const validator=require('validator');
 const jwt=require('jsonwebtoken');
 const _=require('lodash');
+const bcrypt=require('bcryptjs');
 
 var userSchema=new mongoose.Schema({
   email:{
@@ -33,6 +34,32 @@ var userSchema=new mongoose.Schema({
       required:true
     }
   }]
+});
+
+userSchema.pre('save',function(next){
+  var user=this;
+  if(user.isModified('password')){
+
+
+    bcrypt.genSalt(10,(err,salt)=>{
+
+        bcrypt.hash(user.password,salt,(err,hash)=>{
+          console.log('generating salt');
+          console.log(hash);
+
+          user.password=hash;
+          next();
+
+        })
+
+    })
+
+
+
+  }else{
+    next();
+  }
+
 });
 
 userSchema.methods.toJSON=function(){
@@ -67,6 +94,8 @@ userSchema.statics.findByToken=function(token) {
 
     return Promise.reject('cannot decode sorry :( !!');
   }
+
+
 
   //console.log(decoded._id);
 
