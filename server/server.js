@@ -135,13 +135,41 @@ app.post('/users',(req,res)=>{
 });
 
 
+app.post('/users/login',(req,res)=>{
+  //console.log(req.body);
+
+  var body=_.pick(req.body,['email','password']);
+
+  user.findByCredentials(body.email,body.password).then((user)=>{
+    return user.generateAuthToken().then((token)=>{
+    res.header('x-auth',token).status(200).send(user);
+  }).catch((e)=>{
+    res.send(400,`the fuck !! ${e}`);
+  });
+    //  res.status(200).send(user);
+  }).catch((e)=>{
+    res.status(400).send(e);
+  })
+
+});
+
+
 app.get('/users/me',authenticate, (req,res)=>{
+  console.log(req.user);
   res.send(req.user);
 });
 
 app.listen(port,()=>{
   console.log(`started server on port ${port}`);
 });
+
+app.delete('/users/me/token',authenticate,(req,res)=>{
+  req.user.removeToken(req.token).then(()=>{
+    res.status(200).send();
+  }).catch((e)=>{
+    res.status(400).send();
+  })
+})
 
 module.exports={app}
 

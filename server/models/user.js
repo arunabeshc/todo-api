@@ -62,6 +62,19 @@ userSchema.pre('save',function(next){
 
 });
 
+userSchema.methods.removeToken=function(token){
+  var user=this;
+  return user.update({
+    $pull: {
+      tokens: {
+        token: token
+      }
+    }
+  })
+
+  return _.pick(userObject,['_id','email']);
+}
+
 userSchema.methods.toJSON=function(){
   var user=this;
   var userObject=user.toObject();
@@ -86,6 +99,9 @@ userSchema.statics.findByToken=function(token) {
   var decoded;
   try{
     decoded=jwt.verify(token,'abc123');
+    console.log('decoded is ',decoded);
+
+
   }catch(e){
     // var promise=new Promise((resolve,reject)=>{
     //   reject();
@@ -95,16 +111,42 @@ userSchema.statics.findByToken=function(token) {
     return Promise.reject('cannot decode sorry :( !!');
   }
 
-
-
-  //console.log(decoded._id);
-
   return user.findOne({
-    '_id': decoded._id,
+    '_id' : decoded._id,
     'tokens.token': token,
-    'tokens.access': 'auth'
+    'tokens.access': decoded.access
   });
+}
+
+userSchema.statics.findByCredentials=function(email,password) {
+  var user = this;
+
+return user.findOne({
+  'email': email
+}).then((user)=>{
+
+  if(!user){
+      return Promise.reject("user does not exist");
+  }
+  else{
+      console.log('email exists !!');
+      return new Promise((resolve,reject)=>{
+        bcrypt.compare(password,user.password,(err,res)=>{
+          if(!err){
+            resolve(user);
+              console.log('password matches !!');
+          }
+          else{
+            reject();
+          }
+        });
+      })
+  }
+});
 };
+
+
+
 
 var user=mongoose.model('user',userSchema);
 
