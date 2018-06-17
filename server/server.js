@@ -18,7 +18,7 @@ var app=express();
 
 app.use(bodyparser.json());
 
-app.post('/todos',(req,res)=>{
+app.post('/todos',authenticate,(req,res)=>{
   //console.log(req.body);
 
   var todos=new todo({
